@@ -47,44 +47,120 @@
 //leetcode submit region begin(Prohibit modification and deletion)
 class Solution {
 public:
-    vector<vector<string>> findLadders(string beginWord, string endWord, vector<string>& wordList) {
-        vector<vector<string>> result;
-        BFS(beginWord, endWord, wordList, result);
-        return result;
-    }
+    // method1
+//    vector<vector<string>> findLadders(string beginWord, string endWord, vector<string>& wordList) {
+//        vector<vector<string>> result;
+//        BFS(beginWord, endWord, wordList, result);
+//        return result;
+//    }
+//
+//    void BFS(string beginWord, string endWord, vector<string>& wordList, vector<vector<string>>& result){
+//        queue<vector<string>> queue;
+//        vector<string> path;
+//        path.push_back(beginWord);
+//        queue.push(path);
+//        bool isFound = false;
+//        unordered_set<string> dict;
+//        unordered_set<string> visited;
+//        for (string word : wordList){
+//            dict.insert(word);
+//        }
+//        visited.insert(beginWord);
+//        while (!queue.empty()){
+//            int size = queue.size();
+//            unordered_set<string> subVisited;
+//            for (int i = 0; i < size; i++){
+//                vector<string> p = queue.front();
+//                queue.pop();
+//                string curr = p.back();
+//                list<string> neighbors = getNeighbors(curr, dict);
+//                for (string neighbor : neighbors){
+//                    if (visited.find(neighbor) == visited.end()){
+//                        if (neighbor == endWord){
+//                            isFound = true;
+//                            p.push_back(neighbor);
+//                            result.push_back(p);
+//                            p.pop_back();
+//                        }
+//                        p.push_back(neighbor);
+//                        queue.push(p);
+//                        p.pop_back();
+//                        subVisited.insert(neighbor);
+//                    }
+//                }
+//            }
+//            for (string s : subVisited){
+//                visited.insert(s);
+//            }
+//            if (isFound){
+//                break;
+//            }
+//        }
+//    }
+//
+//    list<string> getNeighbors(string curr, unordered_set<string> dict){
+//        list<string> result;
+//        string chs = curr;
+//        for (char ch = 'a'; ch <= 'z'; ch++) {
+//            for (int i = 0; i < curr.size(); i++) {
+//                if (curr[i] == ch){
+//                    continue;
+//                }
+//                char oldCh = curr[i];
+//                chs[i] = ch;
+//                if (dict.find(chs) != dict.end()) {
+//                    result.push_back(chs);
+//                }
+//                chs[i] = oldCh;
+//            }
+//        }
+//        return result;
+//    }
 
-    void BFS(string beginWord, string endWord, vector<string>& wordList, vector<vector<string>>& result){
-        queue<vector<string>> queue;
-        vector<string> path;
-        path.push_back(beginWord);
-        queue.push(path);
+    // method2
+    unordered_map<string, list<string>> graph;
+    unordered_set<string> dict;
+
+    vector<vector<string>> findLadders(string beginWord, string endWord, vector<string>& wordList){
+        vector<vector<string>> result;
         bool isFound = false;
-        unordered_set<string> dict;
+        queue<vector<string>> queue;
         unordered_set<string> visited;
-        for (string word : wordList){
+        for (string word : wordList) {
             dict.insert(word);
         }
+        addGraph(beginWord);
+        for (string word : wordList) {
+            addGraph(word);
+        }
+        addGraph(endWord);
+        if (graph.find(endWord) == graph.end()){
+            return result;
+        }
+        vector<string> p;
+        p.push_back(beginWord);
+        queue.push(p);
         visited.insert(beginWord);
         while (!queue.empty()){
             int size = queue.size();
             unordered_set<string> subVisited;
             for (int i = 0; i < size; i++){
-                vector<string> p = queue.front();
+                vector<string> path = queue.front();
                 queue.pop();
-                string curr = p.back();
-                list<string> neighbors = getNeighbors(curr, dict);
-                for (string neighbor : neighbors){
-                    if (visited.find(neighbor) == visited.end()){
-                        if (neighbor == endWord){
+                list<string> edges = graph[path.back()];
+                for (string edge : edges){
+                    if (visited.find(edge) == visited.end()){
+                        if (edge == endWord){
+                            path.push_back(edge);
+                            result.push_back(path);
+                            path.pop_back();
                             isFound = true;
-                            p.push_back(neighbor);
-                            result.push_back(p);
-                            p.pop_back();
+                        }else{
+                            path.push_back(edge);
+                            queue.push(path);
+                            path.pop_back();
+                            subVisited.insert(edge);
                         }
-                        p.push_back(neighbor);
-                        queue.push(p);
-                        p.pop_back();
-                        subVisited.insert(neighbor);
                     }
                 }
             }
@@ -92,20 +168,27 @@ public:
                 visited.insert(s);
             }
             if (isFound){
-                break;
+                return result;
             }
+        }
+        return result;
+    }
+
+    void addGraph(string word){
+        if (graph.find(word) == graph.end()){
+            graph[word] = getEdges(word);
         }
     }
 
-    list<string> getNeighbors(string curr, unordered_set<string> dict){
+    list<string> getEdges(string word){
         list<string> result;
-        string chs = curr;
+        string chs = word;
         for (char ch = 'a'; ch <= 'z'; ch++) {
-            for (int i = 0; i < curr.size(); i++) {
-                if (curr[i] == ch){
+            for (int i = 0; i < word.size(); i++) {
+                if (word[i] == ch){
                     continue;
                 }
-                char oldCh = curr[i];
+                char oldCh = word[i];
                 chs[i] = ch;
                 if (dict.find(chs) != dict.end()) {
                     result.push_back(chs);

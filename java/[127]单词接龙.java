@@ -1,15 +1,15 @@
-//给定两个单词（beginWord 和 endWord）和一个字典 wordList，找出所有从 beginWord 到 endWord 的最短转换序列。转换
-//需遵循如下规则： 
+//给定两个单词（beginWord 和 endWord）和一个字典，找到从 beginWord 到 endWord 的最短转换序列的长度。转换需遵循如下规则：
+// 
 //
 // 
 // 每次转换只能改变一个字母。 
-// 转换后得到的单词必须是字典中的单词。 
+// 转换过程中的中间单词必须是字典中的单词。 
 // 
 //
 // 说明: 
 //
 // 
-// 如果不存在这样的转换序列，返回一个空列表。 
+// 如果不存在这样的转换序列，返回 0。 
 // 所有单词具有相同的长度。 
 // 所有单词只由小写字母组成。 
 // 字典中不存在重复的单词。 
@@ -23,11 +23,10 @@
 //endWord = "cog",
 //wordList = ["hot","dot","dog","lot","log","cog"]
 //
-//输出:
-//[
-//  ["hit","hot","dot","dog","cog"],
-//  ["hit","hot","lot","log","cog"]
-//]
+//输出: 5
+//
+//解释: 一个最短转换序列是 "hit" -> "hot" -> "dot" -> "dog" -> "cog",
+//     返回它的长度 5。
 // 
 //
 // 示例 2: 
@@ -37,58 +36,47 @@
 //endWord = "cog"
 //wordList = ["hot","dot","dog","lot","log"]
 //
-//输出: []
+//输出: 0
 //
-//解释: endWord "cog" 不在字典中，所以不存在符合要求的转换序列。 
-// Related Topics 广度优先搜索 数组 字符串 回溯算法 
-// 👍 358 👎 0
+//解释: endWord "cog" 不在字典中，所以无法进行转换。 
+// Related Topics 广度优先搜索 
+// 👍 638 👎 0
 
 
 //leetcode submit region begin(Prohibit modification and deletion)
 class Solution {
     //method1
-//    public List<List<String>> findLadders(String beginWord, String endWord, List<String> wordList) {
-//        List<List<String>> result = new ArrayList<>();
-//        BFS(beginWord, endWord, wordList, result);
-//        return result;
+//    public int ladderLength(String beginWord, String endWord, List<String> wordList) {
+//        return BFS(beginWord, endWord, wordList);
 //    }
 //
-//    private void BFS(String beginWord, String endWord, List<String> wordList, List<List<String>> result){
-//        Queue<List<String>> queue = new LinkedList<>();
-//        List<String> path = new ArrayList<>();
-//        path.add(beginWord);
-//        queue.add(path);
-//        boolean isFound = false;
+//    private int BFS(String beginWord, String endWord, List<String> wordList){
+//        int result = 0;
+//        Queue<String> queue = new LinkedList<>();
+//        queue.add(beginWord);
 //        Set<String> dict = new HashSet<>(wordList);
 //        Set<String> visited = new HashSet<>();
 //        visited.add(beginWord);
 //        while (!queue.isEmpty()){
+//            result++;
 //            int size = queue.size();
 //            Set<String> subVisited = new HashSet<>();
 //            for (int i = 0; i < size; i++){
-//                List<String> p = queue.poll();
-//                String curr = p.get(p.size() - 1);
+//                String curr = queue.poll();
 //                List<String> neighbors = getNeighbors(curr, dict);
 //                for (String neighbor : neighbors){
 //                    if (!visited.contains(neighbor)){
 //                        if (neighbor.equals(endWord)){
-//                            isFound = true;
-//                            p.add(neighbor);
-//                            result.add(new ArrayList<>(p));
-//                            p.remove(p.size() - 1);
+//                            return result + 1;
 //                        }
-//                        p.add(neighbor);
-//                        queue.add(new ArrayList<>(p));
-//                        p.remove(p.size() - 1);
+//                        queue.add(neighbor);
 //                        subVisited.add(neighbor);
 //                    }
 //                }
 //            }
 //            visited.addAll(subVisited);
-//            if (isFound){
-//                break;
-//            }
 //        }
+//        return 0;
 //    }
 //
 //    private List<String> getNeighbors(String curr, Set<String> dict) {
@@ -114,10 +102,9 @@ class Solution {
     HashMap<String, List<String>> graph = new HashMap<>();
     Set<String> dict;
 
-    public List<List<String>> findLadders(String beginWord, String endWord, List<String> wordList){
-        List<List<String>> result = new ArrayList<>();
-        boolean isFound = false;
-        Queue<List<String>> queue = new LinkedList<>();
+    public int ladderLength(String beginWord, String endWord, List<String> wordList){
+        int result = 0;
+        Queue<String> queue = new LinkedList<>();
         HashSet<String> visited = new HashSet<>();
         dict = new HashSet<>(wordList);
         addGraph(beginWord);
@@ -128,38 +115,26 @@ class Solution {
         if (graph.get(endWord) == null){
             return result;
         }
-        List<String> p = new ArrayList<>();
-        p.add(beginWord);
-        queue.add(p);
+        queue.add(beginWord);
         visited.add(beginWord);
         while (!queue.isEmpty()){
             int size = queue.size();
-            HashSet<String> subVisited = new HashSet<>();
+            result++;
             for (int i = 0; i < size; i++){
-                List<String> path = queue.poll();
-                List<String> edges = graph.get(path.get(path.size() - 1));
+                String node = queue.poll();
+                List<String> edges = graph.get(node);
                 for (String edge : edges){
                     if (!visited.contains(edge)){
                         if (edge.equals(endWord)){
-                            path.add(edge);
-                            result.add(new ArrayList<>(path));
-                            path.remove(edge);
-                            isFound = true;
-                        }else{
-                            path.add(edge);
-                            queue.add(new ArrayList<>(path));
-                            subVisited.add(edge);
-                            path.remove(edge);
+                            return result + 1;
                         }
+                        queue.add(edge);
+                        visited.add(edge);
                     }
                 }
             }
-            visited.addAll(subVisited);
-            if (isFound){
-                return result;
-            }
         }
-        return result;
+        return 0;
     }
 
     private void addGraph(String word){
