@@ -22,13 +22,13 @@
 class Solution {
 public:
     int singleNumber(vector<int>& nums) {
-        int once = 0;
-        int twice = 0;
+        int one = 0;
+        int two = 0;
         for (int num : nums){
-            once = (once^num)&(~twice);
-            twice = (twice^num)&(~once);
+            one = (one^num)&(~two);
+            two = (two^num)&(~one);
         }
-        return once;
+        return one;
     }
 };
 //leetcode submit region end(Prohibit modification and deletion)
