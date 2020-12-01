@@ -40,13 +40,12 @@ public:
                 root = root->left;
             }
             root = stack.top();
-            stack.pop();
             if (root->right == nullptr || root->right == prev){
                 result.push_back(root->val);
                 prev = root;
                 root = nullptr;
+                stack.pop();
             }else{
-                stack.push(root);
                 root = root->right;
             }
         }

@@ -33,42 +33,42 @@
  * }
  */
 class Solution {
-//    public List<Integer> postorderTraversal(TreeNode root) {
-//        List<Integer> result = new ArrayList<>();
-//        TreeNode node = root;
-//        Stack<TreeNode> stack = new Stack<>();
-//        TreeNode prev = null;
-//        while (node != null || !stack.isEmpty()) {
-//            while (node != null){
-//                stack.push(node);
-//                node = node.left;
-//            }
-//            node = stack.pop();
-//            if (node.right == null || node.right == prev) {
-//                result.add(node.val);
-//                prev = node;
-//                node = null;
-//            }else{
-//                stack.push(node);
-//                node = node.right;
-//            }
-//        }
-//        return result;
-//    }
-
     public List<Integer> postorderTraversal(TreeNode root) {
         List<Integer> result = new ArrayList<>();
-        helper(root, result);
+        TreeNode node = root;
+        Stack<TreeNode> stack = new Stack<>();
+        TreeNode prev = null;
+        while (node != null || !stack.isEmpty()) {
+            while (node != null){
+                stack.push(node);
+                node = node.left;
+            }
+            node = stack.pop();
+            if (node.right == null || node.right == prev) {
+                result.add(node.val);
+                prev = node;
+                node = null;
+            }else{
+                stack.push(node);
+                node = node.right;
+            }
+        }
         return result;
     }
 
-    private void helper(TreeNode node, List<Integer> result){
-        if (node == null){
-            return;
-        }
-        helper(node.left, result);
-        helper(node.right, result);
-        result.add(node.val);
-    }
+//    public List<Integer> postorderTraversal(TreeNode root) {
+//        List<Integer> result = new ArrayList<>();
+//        helper(root, result);
+//        return result;
+//    }
+//
+//    private void helper(TreeNode node, List<Integer> result){
+//        if (node == null){
+//            return;
+//        }
+//        helper(node.left, result);
+//        helper(node.right, result);
+//        result.add(node.val);
+//    }
 }
 //leetcode submit region end(Prohibit modification and deletion)
